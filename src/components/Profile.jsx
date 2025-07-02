@@ -83,8 +83,11 @@ const Profile = () => {
   // Enhanced API client with interceptors
   const createApiClient = useCallback(() => {
     const client = axios.create({
-      baseURL: 'http://localhost:5000/api',
-      timeout: 15000,
+      baseURL: 'https://bookradio-1.onrender.com/api',
+      timeout: 30000, // Increased timeout for Render cold starts
+      headers: {
+        'Content-Type': 'application/json',
+      }
     });
 
     // Request interceptor
@@ -141,7 +144,7 @@ const Profile = () => {
 
   const getAvatarUrl = useCallback(() => {
     if (selectedFile && objectUrlRef.current) return objectUrlRef.current;
-    if (user?.avatar) return `http://localhost:5000/uploads/${user.avatar}?t=${avatarKey}`;
+    if (user?.avatar) return `https://bookradio-1.onrender.com/uploads/${user.avatar}?t=${avatarKey}`;
     return '/default-avatar.png';
   }, [user?.avatar, selectedFile, avatarKey]);
 
@@ -220,7 +223,7 @@ const Profile = () => {
             errorMessage = serverMessage || `Server error (${status})`;
         }
       } else if (err.request) {
-        errorMessage = 'Cannot connect to server. Check if backend is running on http://localhost:5000';
+        errorMessage = 'Cannot connect to server. Please check your internet connection or try again later.';
         setConnectionStatus('offline');
       }
       
