@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-
 import { AlertCircle, CheckCircle, Loader2, User, Sparkles, Heart, X, Mail, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import API from "../api/axios"; 
+
 const SignupModal = ({ onClose, onSwitchToLogin }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -24,7 +24,8 @@ const SignupModal = ({ onClose, onSwitchToLogin }) => {
     }
 
     try {
-     const res = await API.post('/auth/register', {
+      // ✅ FIXED: Changed from '/api/auth/register' to '/auth/register'
+      const res = await API.post('/auth/register', {
         username: name,
         email,
         password
@@ -35,6 +36,7 @@ const SignupModal = ({ onClose, onSwitchToLogin }) => {
         onSwitchToLogin();
       }, 1500);
     } catch (err) {
+      console.error('Signup Error:', err); // Added for debugging
       const message = err.response?.data?.message || 'Signup failed';
       setError(message);
     } finally {

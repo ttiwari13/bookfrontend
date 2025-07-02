@@ -35,6 +35,7 @@ const LoginModal = ({ onClose, onSwitchToSignup }) => {
     }
 
     try {
+      // ✅ FIXED: Changed from '/api/auth/login' to '/auth/login'
       const response = await API.post(
         '/auth/login',
         {
@@ -59,6 +60,7 @@ const LoginModal = ({ onClose, onSwitchToSignup }) => {
       }
 
     } catch (err) {
+      console.error('Login Error:', err); // Added for debugging
       let errorMessage = 'An unexpected error occurred';
 
       if (err.code === 'ECONNABORTED') {
