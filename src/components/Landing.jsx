@@ -3,6 +3,7 @@ import { Headphones, Search, Star, ArrowRight, Play, Sparkles, Zap } from "lucid
 import { motion } from "framer-motion";
 import Layout from "../components/Layout";
 import { useTheme } from "../context/ThemeContext";
+import FloatingFeedbackButton from "./FloatingFeedbackButton";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -387,6 +388,7 @@ const Landing = () => {
           </div>
         </section>
       </div>
+      <FloatingFeedbackButton/>
     </Layout>
   );
 };

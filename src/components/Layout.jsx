@@ -8,7 +8,6 @@ import Footer from "./Footer";
 import Feedback from "./FloatingFeedbackButton";
 import Profile from "./Profile";
 import DropdownSidebar from "./DropdownSidebar";
-import FloatingFeedbackButton from './FloatingFeedbackButton';
 
 const Layout = ({
   children,
@@ -79,7 +78,7 @@ const Layout = ({
       )}
 
       {children}
-      <FloatingFeedbackButton />
+      
       <Footer />
     </div>
   );

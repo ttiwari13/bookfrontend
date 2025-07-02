@@ -1,4 +1,4 @@
-// Home.js - Updated with API instance
+// Home.js - Updated with improved floating button visibility and modal handling
 import { useState, useEffect, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -9,6 +9,7 @@ import BookCard from './BookCard';
 import Layout from "../components/Layout";
 import API from "../api/axios"; // ✅ Use your custom instance named API
 import { useAuth } from "../context/useAuth";
+import FloatingFeedbackButton from './FloatingFeedbackButton';
 
 const Home = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -32,6 +33,7 @@ const Home = () => {
 
   const currentPage = parseInt(searchParams.get('page')) || 1;
 
+  // Update filters and search query from URL parameters
   useEffect(() => {
     const urlFilters = {
       language: searchParams.get('language') || '',
@@ -43,6 +45,7 @@ const Home = () => {
     setSearchQuery(searchParams.get("q") || "");
   }, [searchParams]);
 
+  // Pagination handler
   const setPage = (newPage) => {
     const params = new URLSearchParams(searchParams);
     if (newPage === 1) {
@@ -53,10 +56,11 @@ const Home = () => {
     setSearchParams(params);
   };
 
+  // Filter update handler
   const updateFilters = (newFilters) => {
     setFilters(newFilters);
     const params = new URLSearchParams(searchParams);
-    params.delete('page');
+    params.delete('page'); // Reset to first page when filters change
     Object.entries(newFilters).forEach(([key, value]) => {
       if (value) params.set(key, value);
       else params.delete(key);
@@ -64,10 +68,12 @@ const Home = () => {
     setSearchParams(params);
   };
 
+  // Clear all filters
   const clearFilters = () => {
     updateFilters({ language: '', genre: '', duration: '', author: '' });
   };
 
+  // Authentication check
   useEffect(() => {
     if (authCheckRef.current) return;
     authCheckRef.current = true;
@@ -80,8 +86,10 @@ const Home = () => {
           setAuthChecked(true);
           return;
         }
+        
         setIsLoggedIn(true);
         setAuthChecked(true);
+        
         try {
           const res = await API.get("/api/auth/me", {
             headers: { Authorization: `Bearer ${token}` },
@@ -107,30 +115,44 @@ const Home = () => {
 
     checkLogin();
   }, [setIsLoggedIn]);
-console.log("👉 Base URL:", API.defaults.baseURL);
 
+  // Debug log for API base URL
+  console.log("👉 Base URL:", API.defaults.baseURL);
+
+  // Fetch books and filter options
   useEffect(() => {
     const fetchBooks = async () => {
       if (initialLoad) setLoading(true);
+      setConnectionError(null); // Clear previous errors
+      
       try {
         const queryParams = new URLSearchParams();
         if (searchQuery.trim()) queryParams.set("q", searchQuery.trim());
+        
         Object.entries(filters).forEach(([key, value]) => {
           if (value && value.trim() !== '') queryParams.set(key, value);
         });
+        
         queryParams.set('page', currentPage.toString());
         queryParams.set('limit', '12');
-        const res = await API.get(`/api/books?${queryParams.toString()}`, { timeout: 10000 });
+        
+        const res = await API.get(`/api/books?${queryParams.toString()}`, { 
+          timeout: 10000 
+        });
+        
         const data = res.data;
         setBooks(Array.isArray(data.books) ? data.books : []);
 
       } catch (error) {
         console.error("Fetch error:", error.message);
         setBooks([]);
+        
         if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
-          setConnectionError('Connection timeout. Please check your internet.');
+          setConnectionError('Connection timeout. Please check your internet connection.');
         } else if (error.code === 'ERR_NETWORK') {
           setConnectionError('Network error. Please check if the server is running.');
+        } else {
+          setConnectionError('Failed to load books. Please try again.');
         }
       } finally {
         setLoading(false);
@@ -149,12 +171,14 @@ console.log("👉 Base URL:", API.defaults.baseURL);
             authors: res.data.authors || []
           }));
         }
-      } catch {
+      } catch (error) {
+        console.warn("Failed to fetch filter options, using defaults:", error.message);
+        // Fallback to default options
         setFilterOptions(prev => ({
           ...prev,
-          languages: ['English', 'Hindi'],
-          genres: ['Fiction', 'Romance'],
-          authors: ['Agatha Christie']
+          languages: ['English', 'Hindi', 'Spanish', 'French'],
+          genres: ['Fiction', 'Romance', 'Mystery', 'Thriller', 'Science Fiction'],
+          authors: ['Agatha Christie', 'Stephen King', 'J.K. Rowling']
         }));
       }
     };
@@ -165,6 +189,7 @@ console.log("👉 Base URL:", API.defaults.baseURL);
     }
   }, [currentPage, authChecked, initialLoad, filters, searchQuery]);
 
+  // Search handler
   const handleSearch = () => {
     const params = new URLSearchParams(searchParams);
     if (searchQuery.trim()) {
@@ -172,10 +197,11 @@ console.log("👉 Base URL:", API.defaults.baseURL);
     } else {
       params.delete("q");
     }
-    params.delete("page");
+    params.delete("page"); // Reset to first page on new search
     setSearchParams(params);
   };
 
+  // Modal close handler
   const closeModal = () => {
     setIsLoggedIn(true);
     setConnectionError(null);
@@ -183,24 +209,42 @@ console.log("👉 Base URL:", API.defaults.baseURL);
     authCheckRef.current = true;
   };
 
+  // Modal switch handlers
   const switchToSignup = () => setModalType("signup");
   const switchToLogin = () => setModalType("login");
 
+  // Loading state
   if (!authChecked) {
     return (
-      <div className={`flex justify-center items-center min-h-screen ${darkMode ? 'bg-gray-950 text-white' : 'bg-gray-100 text-black'}`}>
-        Loading...
+      <div className={`flex justify-center items-center min-h-screen ${
+        darkMode ? 'bg-gray-950 text-white' : 'bg-gray-100 text-black'
+      }`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
       </div>
     );
   }
 
   return (
     <>
+      {/* Modal overlay and modals */}
       {!isLoggedIn && (
         <>
-          <div className="fixed inset-0 bg-black/30 z-30" />
-          {modalType === "login" && <LoginModal onClose={closeModal} onSwitchToSignup={switchToSignup} />}
-          {modalType === "signup" && <SignupModal onClose={closeModal} onSwitchToLogin={switchToLogin} />}
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
+          {modalType === "login" && (
+            <LoginModal 
+              onClose={closeModal} 
+              onSwitchToSignup={switchToSignup} 
+            />
+          )}
+          {modalType === "signup" && (
+            <SignupModal 
+              onClose={closeModal} 
+              onSwitchToLogin={switchToLogin} 
+            />
+          )}
         </>
       )}
 
@@ -215,48 +259,93 @@ console.log("👉 Base URL:", API.defaults.baseURL);
         onClearFilters={clearFilters}
       >
         <main className="container mx-auto px-4 py-6">
+          {/* Connection Error Alert */}
           {connectionError && (
-            <div className="bg-red-100 text-red-700 px-4 py-3 rounded mb-6">
-              <strong>Connection Error:</strong> {connectionError}
-              <button onClick={() => window.location.reload()} className="ml-2 underline">Retry</button>
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 shadow-md">
+              <div className="flex items-center justify-between">
+                <div>
+                  <strong className="font-semibold">Connection Error:</strong>
+                  <span className="ml-2">{connectionError}</span>
+                </div>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => window.location.reload()} 
+                    className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
+                  >
+                    Retry
+                  </button>
+                  <button 
+                    onClick={() => setConnectionError(null)} 
+                    className="text-red-500 hover:text-red-700 text-xl leading-none"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
+          {/* Loading State */}
           {loading ? (
-            <div className="text-center py-20">Loading...</div>
+            <div className="text-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+              <p className="text-lg">Loading books...</p>
+            </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 p-2 sm:p-4">
-              {books.length > 0 ? (
-                books.map(book => (
-                  <BookCard key={book._id} book={book} currentPage={currentPage} />
-                ))
-              ) : (
-                <div className="col-span-full text-center py-20">No books found</div>
-              )}
-            </div>
-          )}
+            <>
+              {/* Books Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 p-2 sm:p-4">
+                {books.length > 0 ? (
+                  books.map(book => (
+                    <BookCard 
+                      key={book._id} 
+                      book={book} 
+                      currentPage={currentPage} 
+                    />
+                  ))
+                ) : (
+                  <div className="col-span-full text-center py-20">
+                    <div className="text-gray-500 dark:text-gray-400">
+                      <p className="text-xl mb-2">📚 No books found</p>
+                      <p>Try adjusting your search or filters</p>
+                    </div>
+                  </div>
+                )}
+              </div>
 
-          {books.length > 0 && (
-            <div className="flex justify-center items-center mt-12 gap-4">
-              <button 
-                onClick={() => setPage(Math.max(currentPage - 1, 1))} 
-                disabled={currentPage === 1} 
-                className="bg-gray-200 dark:bg-gray-700 p-2 rounded disabled:opacity-50"
-              >
-                <ChevronLeft />
-              </button>
-              <span className="px-4 py-2 bg-green-200 dark:bg-green-700 text-black dark:text-white rounded">
-                {currentPage}
-              </span>
-              <button 
-                onClick={() => setPage(currentPage + 1)} 
-                className="bg-gray-200 dark:bg-gray-700 p-2 rounded"
-              >
-                <ChevronRight />
-              </button>
-            </div>
+              {/* Pagination */}
+              {books.length > 0 && (
+                <div className="flex justify-center items-center mt-12 gap-4">
+                  <button 
+                    onClick={() => setPage(Math.max(currentPage - 1, 1))} 
+                    disabled={currentPage === 1} 
+                    className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 p-2 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    aria-label="Previous page"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  
+                  <span className="px-4 py-2 bg-green-200 dark:bg-green-700 text-black dark:text-white rounded font-medium">
+                    Page {currentPage}
+                  </span>
+                  
+                  <button 
+                    onClick={() => setPage(currentPage + 1)} 
+                    className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 p-2 rounded transition-colors"
+                    aria-label="Next page"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </main>
+
+        {/* Floating Feedback Button - High z-index to appear above modals */}
+        <div className="fixed bottom-4 right-4 z-50">
+          <FloatingFeedbackButton />
+        </div>
       </Layout>
     </>
   );
