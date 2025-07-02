@@ -150,15 +150,15 @@ const BookDetail = () => {
 
   return (
     <Layout showSearch={false}>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
-        {/* Animated Background Elements */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
-          <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '4s'}}></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 relative">
+        {/* Background Elements - Fixed positioning removed */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse transform translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse transform -translate-x-1/2 translate-y-1/2" style={{animationDelay: '2s'}}></div>
+          <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl animate-pulse transform -translate-x-1/2 -translate-y-1/2" style={{animationDelay: '4s'}}></div>
         </div>
 
-        <div className="relative container mx-auto px-4 py-6 z-10">
+        <div className="relative container mx-auto px-4 py-6 z-10 max-w-7xl">
           {/* Hero Section */}
           <div className="grid lg:grid-cols-5 gap-8 mb-12">
             {/* Book Cover */}
@@ -167,7 +167,7 @@ const BookDetail = () => {
                 <img 
                   src={book.cover || book.image || book.coverImage} 
                   alt={book.title} 
-                  className="w-full h-auto transition-transform duration-1000 group-hover:scale-110" 
+                  className="w-full h-auto max-w-full transition-transform duration-1000 group-hover:scale-110" 
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
@@ -195,16 +195,16 @@ const BookDetail = () => {
             {/* Book Info */}
             <div className="lg:col-span-3 space-y-6">
               <div className="space-y-4">
-                <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent animate-fade-in">
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent animate-fade-in break-words">
                   {book.title}
                 </h1>
-                <p className="text-2xl text-gray-300 animate-fade-in" style={{animationDelay: '0.2s'}}>
+                <p className="text-xl md:text-2xl text-gray-300 animate-fade-in break-words" style={{animationDelay: '0.2s'}}>
                   by <span className="text-purple-400 font-semibold">{book.author}</span>
                 </p>
               </div>
 
               {/* Stats Grid */}
-              <div className="grid grid-cols-2 gap-6 animate-fade-in" style={{animationDelay: '0.4s'}}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6 animate-fade-in" style={{animationDelay: '0.4s'}}>
                 {[
                   { icon: Globe, label: book.language, color: 'text-blue-400' },
                   { icon: Tag, label: book.genre, color: 'text-purple-400' },
@@ -216,24 +216,24 @@ const BookDetail = () => {
                     className="group p-4 bg-gradient-to-br from-slate-800/50 to-slate-700/50 backdrop-blur-sm rounded-xl border border-slate-600 hover:border-purple-400 transition-all duration-500 transform hover:scale-105 hover:shadow-xl"
                   >
                     <div className="flex items-center gap-3">
-                      <Icon size={20} className={`${color} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12`} />
-                      <span className="text-gray-200 font-medium">{label}</span>
+                      <Icon size={20} className={`${color} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12 flex-shrink-0`} />
+                      <span className="text-gray-200 font-medium truncate">{label}</span>
                     </div>
                   </div>
                 ))}
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-4 animate-fade-in" style={{animationDelay: '0.6s'}}>
+              <div className="flex flex-col sm:flex-row gap-4 animate-fade-in" style={{animationDelay: '0.6s'}}>
                 <button 
                    onClick={() => episodes[0] && handlePlayEpisode(episodes[0])} 
-                  className="group flex-1 px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white rounded-xl flex items-center justify-center gap-3 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl font-semibold text-lg"
+                  className="group flex-1 px-6 lg:px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white rounded-xl flex items-center justify-center gap-3 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl font-semibold text-lg relative overflow-hidden"
                 >
-                  <Play size={24} className="transition-transform duration-300 group-hover:scale-110" /> 
-                  Start Reading
+                  <Play size={24} className="transition-transform duration-300 group-hover:scale-110 flex-shrink-0" /> 
+                  <span className="truncate">Start Reading</span>
                   <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 rounded-xl transition-opacity duration-500"></div>
                 </button>
-                <button className="px-8 py-4 border-2 border-slate-600 hover:border-purple-400 text-white rounded-xl transition-all duration-500 transform hover:scale-105 hover:shadow-xl hover:bg-slate-800/50 font-semibold">
+                <button className="px-6 lg:px-8 py-4 border-2 border-slate-600 hover:border-purple-400 text-white rounded-xl transition-all duration-500 transform hover:scale-105 hover:shadow-xl hover:bg-slate-800/50 font-semibold whitespace-nowrap">
                   Add to Library
                 </button>
               </div>
@@ -241,13 +241,13 @@ const BookDetail = () => {
           </div>
 
           {/* Enhanced Tabs */}
-          <div className="border-b border-slate-700 mb-8">
-            <div className="flex gap-8">
+          <div className="border-b border-slate-700 mb-8 overflow-x-auto">
+            <div className="flex gap-8 min-w-max">
               {['overview', 'episodes', 'reviews'].map((tab, index) => (
                 <button 
                   key={tab} 
                   onClick={() => setActiveTab(tab)} 
-                  className={`group relative pb-4 font-semibold text-lg transition-all duration-500 transform hover:scale-105 ${
+                  className={`group relative pb-4 font-semibold text-lg transition-all duration-500 transform hover:scale-105 whitespace-nowrap ${
                     activeTab === tab 
                       ? 'text-purple-400' 
                       : 'text-gray-400 hover:text-white'
@@ -271,7 +271,7 @@ const BookDetail = () => {
             {activeTab === 'overview' && (
               <div className="prose prose-lg prose-invert max-w-none">
                 <div 
-                  className="text-gray-300 leading-relaxed space-y-4 p-6 bg-gradient-to-br from-slate-800/30 to-slate-700/30 backdrop-blur-sm rounded-xl border border-slate-600"
+                  className="text-gray-300 leading-relaxed space-y-4 p-6 bg-gradient-to-br from-slate-800/30 to-slate-700/30 backdrop-blur-sm rounded-xl border border-slate-600 overflow-hidden"
                   dangerouslySetInnerHTML={{ __html: book.description || '<p>No description available.</p>' }}
                 />
               </div>
@@ -282,38 +282,38 @@ const BookDetail = () => {
                 {episodes.map((ep, i) => (
                   <div 
                     key={ep._id} 
-                    className="group p-6 rounded-2xl border border-slate-700 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm text-white transition-all duration-500 hover:border-purple-400 hover:shadow-2xl transform hover:scale-[1.02]"
+                    className="group p-6 rounded-2xl border border-slate-700 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm text-white transition-all duration-500 hover:border-purple-400 hover:shadow-2xl transform hover:scale-[1.02] overflow-hidden"
                     style={{animationDelay: `${i * 0.1}s`}}
                   >
                     <div 
                       onClick={() => handlePlayEpisode(ep)} 
                       className="flex justify-between items-center cursor-pointer"
                     >
-                      <div className="space-y-2">
-                        <h4 className="font-semibold text-lg group-hover:text-purple-300 transition-colors duration-300">
+                      <div className="space-y-2 flex-1 min-w-0">
+                        <h4 className="font-semibold text-lg group-hover:text-purple-300 transition-colors duration-300 truncate">
                           {ep.title || `Episode ${ep.episodeNumber || i + 1}`}
                         </h4>
                         <p className="text-sm text-gray-400 flex items-center gap-2">
-                          <Clock size={14} />
+                          <Clock size={14} className="flex-shrink-0" />
                           {formatDuration(ep.duration)}
                         </p>
                       </div>
-                      <div className="p-3 bg-purple-600/20 hover:bg-purple-600/40 rounded-full transition-all duration-300 transform group-hover:scale-110">
+                      <div className="p-3 bg-purple-600/20 hover:bg-purple-600/40 rounded-full transition-all duration-300 transform group-hover:scale-110 flex-shrink-0 ml-4">
                         <Play size={20} />
                       </div>
                     </div>
 
                     {/* Enhanced Audio Player */}
                     {currentEpisodeId === ep._id && (
-                      <div className="mt-6 p-4 bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-xl border border-purple-500/30 animate-fade-in">
-                        <div className="flex justify-between items-center mb-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                      <div className="mt-6 p-4 bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-xl border border-purple-500/30 animate-fade-in overflow-hidden">
+                        <div className="flex justify-between items-center mb-4 gap-4">
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse flex-shrink-0"></div>
                             <p className="text-sm text-purple-300 truncate font-medium">
                               Now Playing: {currentEpisodeTitle}
                             </p>
                           </div>
-                          <div className="flex gap-3 items-center">
+                          <div className="flex gap-3 items-center flex-shrink-0">
                             <button 
                               onClick={() => jump(-10)}
                               className="p-2 hover:bg-white/10 rounded-full transition-all duration-300 transform hover:scale-110"
@@ -340,7 +340,7 @@ const BookDetail = () => {
                                 <Volume2 size={18} />
                               </button>
                               {showVolumeSlider && (
-                                <div className="absolute bottom-full right-0 mb-2 p-2 bg-slate-800 rounded-lg border border-slate-600 animate-fade-in">
+                                <div className="absolute bottom-full right-0 mb-2 p-2 bg-slate-800 rounded-lg border border-slate-600 animate-fade-in z-10">
                                   <input
                                     type="range"
                                     min="0"
