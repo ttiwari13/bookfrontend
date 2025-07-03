@@ -224,7 +224,7 @@ const Footer = () => {
                 </span>
                 <span>• All rights reserved</span>
                 <span>
-                <p className="text-xs text-muted-foreground mt-2">
+                <p className="text-xs from-[#D2ECC1] to-[#A8D8A0] text-muted-foreground mt-2">
   📢 <strong>Disclaimer:</strong> All audiobooks on BookRadio are streamed via LibriVox and are in the public domain in the United States. If you're outside the U.S., please verify the copyright laws of your country before listening.
 </p></span>
 
